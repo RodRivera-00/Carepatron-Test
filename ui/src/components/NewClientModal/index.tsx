@@ -71,6 +71,8 @@ const steps: FormStep[] = [
 					if (input === '') return { error: true, message: 'Email is required' };
 					if (input === null) return { error: true, message: 'Email is required' };
 					if (input === undefined) return { error: true, message: 'Email is required' };
+					if (!/^[a-zA-Z0-9]+@(?:[a-zA-Z0-9]+\.)+[A-Za-z]+$/.test(input))
+						return { error: true, message: 'Invalid email format' };
 					return { error: false };
 				},
 			},
@@ -82,6 +84,8 @@ const steps: FormStep[] = [
 					if (input === '') return { error: true, message: 'Phone number is required' };
 					if (input === null) return { error: true, message: 'Phone number is required' };
 					if (input === undefined) return { error: true, message: 'Phone number is required' };
+					if (!/^\+(?:[0-9] ?){6,14}[0-9]$/.test(input))
+						return { error: true, message: 'Invalid phone number format. Ex. +18888888' };
 					return { error: false };
 				},
 			},
@@ -153,14 +157,19 @@ const NewClientModal = ({ open = true, onClose }: NewClientModalProps) => {
 			});
 			try {
 				createClient({ ...formattedForm, id: uuidv4() } as unknown as IClient);
-				onClose && onClose();
+				onCloseMiddleware();
 			} catch (e) {
 				alert(e);
 			}
 		}
 	};
+	const onCloseMiddleware = () => {
+		setStepIndex(() => 0);
+		setFormState({});
+		onClose && onClose();
+	};
 	return (
-		<Modal open={open} onClose={onClose}>
+		<Modal open={open} onClose={onCloseMiddleware}>
 			<Box
 				sx={{
 					position: 'absolute',
@@ -183,7 +192,7 @@ const NewClientModal = ({ open = true, onClose }: NewClientModalProps) => {
 					<Typography variant='h5' sx={{ textAlign: 'start' }}>
 						Create new client
 					</Typography>
-					<IconButton onClick={onClose}>
+					<IconButton onClick={onCloseMiddleware}>
 						<CloseIcon sx={{ color: '#9e9e9e' }} />
 					</IconButton>
 				</Container>
