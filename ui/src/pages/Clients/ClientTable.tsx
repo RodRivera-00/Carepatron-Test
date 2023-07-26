@@ -19,17 +19,23 @@ export default function BasicTable({ clients, filter = '' }: BasicTableProps) {
 				<TableHead>
 					<TableRow>
 						<TableCell>Name</TableCell>
-						<TableCell>Phone number</TableCell>
+						<TableCell>Phone</TableCell>
 						<TableCell>Email</TableCell>
 					</TableRow>
 				</TableHead>
 				<TableBody>
 					{clients
 						.filter((item) => {
+							// Filters the ff:
+							// First name only
+							// Last name only
+							// First name + Last name
+							// Last name + First name
 							return (
 								item.firstName.toLowerCase().includes(filter.toLowerCase()) ||
 								item.lastName.toLowerCase().includes(filter.toLowerCase()) ||
-								`${item.firstName} ${item.lastName}`.toLowerCase().includes(filter.toLowerCase())
+								`${item.firstName} ${item.lastName}`.toLowerCase().includes(filter.toLowerCase()) ||
+								`${item.lastName} ${item.firstName}`.toLowerCase().includes(filter.toLowerCase())
 							);
 						})
 						.map((client) => (

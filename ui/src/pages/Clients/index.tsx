@@ -1,19 +1,23 @@
 import { memo, useContext, useEffect, useState } from 'react';
 import { Container, Paper, Typography, InputAdornment, Button, Input } from '@mui/material';
+
 import SearchIcon from '@mui/icons-material/Search';
+
 import { StateContext } from '../../store/DataProvider';
 import Page from '../../components/Page';
 import ClientTable from './ClientTable';
 import { getClients } from '../../services/api';
+import NewClientModal from '../../components/NewClientModal';
 
 function Clients() {
 	const [search, setSearch] = useState('');
+	const [createModalOpen, setCreateModalOpen] = useState(false);
 	const { state, dispatch } = useContext(StateContext);
 	const { clients } = state;
 
 	useEffect(() => {
 		getClients().then((clients) => dispatch({ type: 'FETCH_ALL_CLIENTS', data: clients }));
-	}, [dispatch]);
+	}, [dispatch, createModalOpen]);
 
 	return (
 		<Page>
@@ -57,6 +61,7 @@ function Clients() {
 						borderRadius: '10px',
 						textTransform: 'none',
 					}}
+					onClick={() => setCreateModalOpen(() => true)}
 				>
 					Create new client
 				</Button>
@@ -72,6 +77,7 @@ function Clients() {
 			>
 				<ClientTable clients={clients} filter={search} />
 			</Paper>
+			<NewClientModal open={createModalOpen} onClose={() => setCreateModalOpen(() => false)} />
 		</Page>
 	);
 }
