@@ -36,6 +36,7 @@ function Clients() {
 		onSuccess: (data) => {
 			dispatch({ type: 'FETCH_ALL_CLIENTS', data: data });
 		},
+		staleTime: 30000,
 	});
 	const mutation = useMutation({
 		mutationFn: createClient,
