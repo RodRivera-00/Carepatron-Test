@@ -8,6 +8,7 @@ import Modal from '@mui/material/Modal';
 
 import CloseIcon from '@mui/icons-material/Close';
 
+import { InputTypes } from '../../../components/MultiStepForm/InputPicker';
 import { createClient } from '../../../services/api';
 import MultiStepForm, { FormData, FormStep, ValidationMessage } from '../../../components/MultiStepForm';
 
@@ -16,15 +17,13 @@ interface NewClientModalProps {
 	onClose?(): void;
 }
 
-// This could be refactored into another stepper form component
-
 const steps: FormStep[] = [
 	{
 		label: 'Personal details',
 		inputs: [
 			{
 				label: 'First name',
-				type: 'text',
+				type: InputTypes.TEXT,
 				key: 'firstName',
 				validation: (input): ValidationMessage => {
 					if (input === '') return { error: true, message: 'First name is required' };
@@ -35,7 +34,17 @@ const steps: FormStep[] = [
 			},
 			{
 				label: 'Last name',
-				type: 'text',
+				type: InputTypes.SELECT,
+				options: [
+					{
+						label: 'Option 1',
+						value: 'Option 1',
+					},
+					{
+						label: 'Option 2',
+						value: 'Option 2',
+					},
+				],
 				key: 'lastName',
 				validation: (input): ValidationMessage => {
 					if (input === '') return { error: true, message: 'Last name is required' };
@@ -51,7 +60,7 @@ const steps: FormStep[] = [
 		inputs: [
 			{
 				label: 'Email',
-				type: 'email',
+				type: InputTypes.EMAIL,
 				key: 'email',
 				validation: (input): ValidationMessage => {
 					if (input === '') return { error: true, message: 'Email is required' };
@@ -64,7 +73,7 @@ const steps: FormStep[] = [
 			},
 			{
 				label: 'Phone number',
-				type: 'text',
+				type: InputTypes.TEXT,
 				key: 'phoneNumber',
 				validation: (input): ValidationMessage => {
 					if (input === '') return { error: true, message: 'Phone number is required' };

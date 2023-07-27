@@ -1,11 +1,13 @@
 import React, { useReducer } from 'react';
+
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
-import Input from '@mui/material/Input';
 import Typography from '@mui/material/Typography';
 import CheckIcon from '@mui/icons-material/Check';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+
+import InputPicker, { FormInputProps, FormOptions, InputTypes } from './InputPicker';
 
 export interface ValidationMessage {
 	error: boolean;
@@ -14,9 +16,11 @@ export interface ValidationMessage {
 
 interface FormInput {
 	label: string;
-	type: string;
+	type: InputTypes;
 	key: string;
+	options?: FormOptions[];
 	validation(input: string): ValidationMessage;
+	props?: FormInputProps['props'];
 }
 
 type InputKeys = Extract<FormInput['key'], string>;
@@ -41,18 +45,13 @@ export interface FormStep {
 	inputs: FormInput[];
 }
 
-interface MultiStepFormProps {
-	steps: FormStep[];
-	onComplete(formValue: FormData): void;
-}
+// Form Reducer
 
-// Action types for useReducer
 enum ActionTypes {
 	UPDATE_FORM_FIELD,
 	RESET_FORM,
 }
 
-// Action for updating form field value
 interface UpdateFormFieldAction {
 	type: ActionTypes.UPDATE_FORM_FIELD;
 	payload: {
@@ -80,6 +79,13 @@ const formReducer = (state: FormData, action: FormAction): FormData => {
 			return state;
 	}
 };
+
+// Component Props
+
+interface MultiStepFormProps {
+	steps: FormStep[];
+	onComplete(formValue: FormData): void;
+}
 
 const MultiStepForm = ({ steps, onComplete }: MultiStepFormProps) => {
 	const [formState, dispatch] = useReducer(formReducer, {});
@@ -210,31 +216,16 @@ const MultiStepForm = ({ steps, onComplete }: MultiStepFormProps) => {
 			</Container>
 			<Container sx={{ mt: 2 }} disableGutters>
 				{currentStep.inputs.map((input) => (
-					<Container sx={{ mt: 1 }} key={`Input-${input.key}`} disableGutters>
-						<Typography
-							sx={{
-								fontSize: '14px',
-								color: formState[input.key]?.validation?.error ? 'red' : '#bdbebe',
-							}}
-						>
-							{input.label}
-						</Typography>
-						<Input
-							value={formState[input.key]?.value ?? ''}
-							sx={{
-								border: formState[input.key]?.validation?.error ? '2px solid red' : '2px solid #bdbebe',
-								borderRadius: '5px',
-								paddingY: 1,
-								paddingX: 1.5,
-							}}
-							fullWidth
-							disableUnderline
-							onChange={(e) => onChange(input.key, e.target.value)}
-						/>
-						<Typography sx={{ fontSize: '14px', color: 'red' }}>
-							{formState[input.key]?.validation?.message}
-						</Typography>
-					</Container>
+					<InputPicker
+						key={`Input-${input.key}`}
+						type={input.type}
+						label={input.label}
+						error={formState[input.key]?.validation?.error}
+						helper={formState[input.key]?.validation?.message}
+						options={input.options}
+						value={formState[input.key]?.value}
+						onChange={(value) => onChange(input.key, value)}
+					/>
 				))}
 			</Container>
 			<Container
