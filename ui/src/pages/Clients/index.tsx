@@ -36,6 +36,12 @@ function Clients() {
 		onSuccess: (data) => {
 			dispatch({ type: 'FETCH_ALL_CLIENTS', data: data });
 		},
+		onError: (e) => {
+			setToastMessage(() => ({
+				type: 'error',
+				message: `An error occured: ${e}`,
+			}));
+		},
 		staleTime: 30000,
 	});
 	const mutation = useMutation({

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 import Box from '@mui/material/Box';
@@ -10,7 +9,6 @@ import Modal from '@mui/material/Modal';
 import CloseIcon from '@mui/icons-material/Close';
 
 import { InputTypes } from '../../components/MultiStepForm/InputPicker';
-import { createClient } from '../../services/api';
 import MultiStepForm, { FormData, FormStep, ValidationMessage } from '../../components/MultiStepForm';
 
 interface NewClientModalProps {
