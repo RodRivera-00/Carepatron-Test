@@ -223,6 +223,7 @@ const MultiStepForm = ({ steps, onComplete }: MultiStepFormProps) => {
 						error={formState[input.key]?.validation?.error}
 						helper={formState[input.key]?.validation?.message}
 						options={input.options}
+						props={input.props}
 						value={formState[input.key]?.value}
 						onChange={(value) => onChange(input.key, value)}
 					/>
