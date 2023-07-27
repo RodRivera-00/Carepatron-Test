@@ -5,9 +5,11 @@ import SearchIcon from '@mui/icons-material/Search';
 
 import { StateContext } from '../../store/DataProvider';
 import Page from '../../components/Page';
-import ClientTable from './ClientTable';
+
 import { getClients } from '../../services/api';
-import NewClientModal from '../../components/NewClientModal';
+
+import ClientTable from './ClientTable';
+import NewClientModal from './NewClientModal';
 
 function Clients() {
 	const [search, setSearch] = useState('');
