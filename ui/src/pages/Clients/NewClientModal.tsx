@@ -6,8 +6,6 @@ import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import Modal from '@mui/material/Modal';
-import Snackbar from '@mui/material/Snackbar';
-import Alert, { AlertColor } from '@mui/material/Alert';
 
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -18,6 +16,7 @@ import MultiStepForm, { FormData, FormStep, ValidationMessage } from '../../comp
 interface NewClientModalProps {
 	open?: boolean;
 	onClose?(): void;
+	onComplete?(value: IClient): void;
 }
 
 const steps: FormStep[] = [
@@ -114,33 +113,14 @@ const steps: FormStep[] = [
 	},
 ];
 
-const NewClientModal = ({ open = true, onClose }: NewClientModalProps) => {
-	const [toastMessage, setToastMessage] = useState<{ type: AlertColor; message: string } | undefined>();
-	const onComplete = async (formValue: FormData) => {
-		try {
-			await createClient({ ...formValue, id: uuidv4() } as unknown as IClient);
-			setToastMessage(() => ({
-				type: 'success',
-				message: 'Successfully added a client',
-			}));
-		} catch (e) {
-			setToastMessage(() => ({
-				type: 'error',
-				message: `An error occured: ${e}`,
-			}));
-		}
-
-		onCloseMiddleware();
-	};
-	const onCloseMiddleware = () => {
+const NewClientModal = ({ open = true, onClose, onComplete }: NewClientModalProps) => {
+	const onCompleteForm = async (formValue: FormData) => {
+		onComplete && onComplete({ ...formValue, id: uuidv4() } as unknown as IClient);
 		onClose && onClose();
-	};
-	const onCloseToast = () => {
-		setToastMessage(undefined);
 	};
 	return (
 		<>
-			<Modal open={open} onClose={onCloseMiddleware}>
+			<Modal open={open} onClose={onClose}>
 				<Box
 					sx={{
 						position: 'absolute',
@@ -163,26 +143,13 @@ const NewClientModal = ({ open = true, onClose }: NewClientModalProps) => {
 						<Typography variant='h5' sx={{ textAlign: 'start' }}>
 							Create new client
 						</Typography>
-						<IconButton onClick={onCloseMiddleware}>
+						<IconButton onClick={onClose}>
 							<CloseIcon sx={{ color: '#9e9e9e' }} />
 						</IconButton>
 					</Container>
-					<MultiStepForm steps={steps} onComplete={onComplete} />
+					<MultiStepForm steps={steps} onComplete={onCompleteForm} />
 				</Box>
 			</Modal>
-			<Snackbar
-				open={toastMessage !== undefined}
-				autoHideDuration={6000}
-				anchorOrigin={{
-					vertical: 'top',
-					horizontal: 'center',
-				}}
-				onClose={onCloseToast}
-			>
-				<Alert onClose={onCloseToast} severity={toastMessage?.type ?? 'success'} sx={{ width: '100%' }}>
-					{toastMessage?.message}
-				</Alert>
-			</Snackbar>
 		</>
 	);
 };

@@ -1,12 +1,21 @@
-import { memo, useContext, useEffect, useState } from 'react';
-import { Container, Paper, Typography, InputAdornment, Button, Input } from '@mui/material';
+import { memo, useContext, useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
+import Container from '@mui/material/Container';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
+import InputAdornment from '@mui/material/InputAdornment';
+import Button from '@mui/material/Button';
+import Input from '@mui/material/Input';
+import Snackbar from '@mui/material/Snackbar';
+import Alert, { AlertColor } from '@mui/material/Alert';
 
 import SearchIcon from '@mui/icons-material/Search';
 
 import { StateContext } from '../../store/DataProvider';
 import Page from '../../components/Page';
 
-import { getClients } from '../../services/api';
+import { getClients, createClient } from '../../services/api';
 
 import ClientTable from './ClientTable';
 import NewClientModal from './NewClientModal';
@@ -14,13 +23,42 @@ import NewClientModal from './NewClientModal';
 function Clients() {
 	const [search, setSearch] = useState('');
 	const [createModalOpen, setCreateModalOpen] = useState(false);
+	const [toastMessage, setToastMessage] = useState<{ type: AlertColor; message: string } | undefined>();
+
 	const { state, dispatch } = useContext(StateContext);
 	const { clients } = state;
 
-	useEffect(() => {
-		getClients().then((clients) => dispatch({ type: 'FETCH_ALL_CLIENTS', data: clients }));
-	}, [dispatch, createModalOpen]);
-
+	//React Query
+	const queryClient = useQueryClient();
+	const { isLoading } = useQuery({
+		queryKey: ['clients'],
+		queryFn: getClients,
+		onSuccess: (data) => {
+			dispatch({ type: 'FETCH_ALL_CLIENTS', data: data });
+		},
+	});
+	const mutation = useMutation({
+		mutationFn: createClient,
+		onSuccess: () => {
+			setToastMessage(() => ({
+				type: 'success',
+				message: 'Successfully added a client',
+			}));
+			queryClient.invalidateQueries({ queryKey: ['clients'] });
+		},
+		onError: (e) => {
+			setToastMessage(() => ({
+				type: 'error',
+				message: `An error occured: ${e}`,
+			}));
+		},
+	});
+	const onComplete = (value: IClient) => {
+		mutation.mutate(value);
+	};
+	const onCloseToast = () => {
+		setToastMessage(undefined);
+	};
 	return (
 		<Page>
 			<Typography variant='h4' sx={{ textAlign: 'start', fontWeight: 'bold' }}>
@@ -77,9 +115,26 @@ function Clients() {
 					borderRadius: '10px',
 				}}
 			>
-				<ClientTable clients={clients} filter={search} />
+				{isLoading ? <Typography>Loading...</Typography> : <ClientTable clients={clients} filter={search} />}
 			</Paper>
-			<NewClientModal open={createModalOpen} onClose={() => setCreateModalOpen(() => false)} />
+			<NewClientModal
+				open={createModalOpen}
+				onClose={() => setCreateModalOpen(() => false)}
+				onComplete={onComplete}
+			/>
+			<Snackbar
+				open={toastMessage !== undefined}
+				autoHideDuration={6000}
+				anchorOrigin={{
+					vertical: 'top',
+					horizontal: 'center',
+				}}
+				onClose={onCloseToast}
+			>
+				<Alert onClose={onCloseToast} severity={toastMessage?.type ?? 'success'} sx={{ width: '100%' }}>
+					{toastMessage?.message}
+				</Alert>
+			</Snackbar>
 		</Page>
 	);
 }
