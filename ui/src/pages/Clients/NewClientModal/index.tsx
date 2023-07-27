@@ -60,7 +60,7 @@ const steps: FormStep[] = [
 		inputs: [
 			{
 				label: 'Email',
-				type: InputTypes.EMAIL,
+				type: InputTypes.TEXT,
 				key: 'email',
 				validation: (input): ValidationMessage => {
 					if (input === '') return { error: true, message: 'Email is required' };
