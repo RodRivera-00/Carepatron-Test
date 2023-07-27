@@ -1,5 +1,5 @@
 import { InputProps } from '@mui/material/Input';
-import { NativeSelectProps } from '@mui/material/NativeSelect';
+import { SelectProps } from '@mui/material/Select';
 
 import TextInput from './TextInput';
 import SelectInput from './SelectInput';
@@ -24,7 +24,7 @@ export interface FormInputProps {
 	error?: boolean;
 	helper?: string;
 	options?: FormOptions[];
-	props?: InputProps | NativeSelectProps;
+	props?: InputProps | SelectProps;
 	value?: any;
 	onChange?(value: any): void;
 }
@@ -51,7 +51,7 @@ const InputPicker = ({ type, label, error, helper, options, value, onChange, pro
 				options={options}
 				value={value}
 				onChange={onChange}
-				{...(props as NativeSelectProps)}
+				{...(props as Omit<SelectProps, 'label' | 'onChange'>)}
 			/>
 		);
 	}
